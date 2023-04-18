@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  user-service:
+    build: ./user-service
+    image: user-service-app
+    environment:
+      - DB_HOST=user-db
+      - DB_PORT=5432
+      - DB_NAME=user-db      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    ports:
+      - "8081:8080"
+    depends_on:
+      user-db:
+        condition: service_healthy
+
+  user-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./user-service/docker-postgres-init.sql:/docker-entrypoint-initdb.d/docker-postgres-init.sql
+      - ./user-service-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  post-service:
+    build: ./post-service
+    image: post-service-app
+    environment:
+      - DB_HOST=post-db
+      - DB_PORT=5432
+      - DB_NAME=post-db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - USER_SERVICE_URL=http://user-service:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      post-db:
+        condition: service_healthy
+
+  post-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: post-db
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./post-service/docker-postgres-init.sql:/docker-entrypoint-initdb.d/docker-postgres-init.sql
+      - ./post-service-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
