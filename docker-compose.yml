@@ -3,11 +3,12 @@ version: '3.8'
 services:
   user-service:
     build: ./user-service
-    image: user-service-app
+    image: epamnikitafaskheyeu/user-service-app:v1.0
     environment:
       - DB_HOST=user-db
       - DB_PORT=5432
-      - DB_NAME=user-db      - DB_USERNAME=postgres
+      - DB_NAME=user-db
+      - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
     ports:
       - "8081:8080"
@@ -34,7 +35,7 @@ services:
 
   post-service:
     build: ./post-service
-    image: post-service-app
+    image: epamnikitafaskheyeu/post-service-app:v1.0
     environment:
       - DB_HOST=post-db
       - DB_PORT=5432
