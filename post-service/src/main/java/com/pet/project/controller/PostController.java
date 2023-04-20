@@ -1,7 +1,9 @@
 package com.pet.project.controller;
 
+import com.pet.project.common.AdditionDirection;
 import com.pet.project.entity.Post;
 import com.pet.project.service.PostService;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

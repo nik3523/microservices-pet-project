@@ -1,7 +1,9 @@
 package com.pet.project.controller;
 
+import com.pet.project.common.AdditionDirection;
 import com.pet.project.entity.User;
 import com.pet.project.service.UserService;
+import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,12 +52,17 @@ public class UserController {
     }
 
     @PostMapping("/users/{id}/posts")
-    public int countPostForUser(@PathVariable Long id) {
-        return userService.countNewPost(id);
+    public int countPostForUser(@PathVariable Long id, @RequestBody Direction direction) {
+        return userService.countNewPost(id, direction.getDirection());
     }
 
     @GetMapping("/getAllUsers")
     public List<User> getAllUsers(){
         return userService.getAllUsers();
+    }
+
+    @Data
+    private static class Direction {
+        private AdditionDirection direction;
     }
 }
