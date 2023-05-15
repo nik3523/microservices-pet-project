@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-service-app
+  namespace: k8s-program
+spec:
+  selector:
+    matchLabels:
+      app: post-service-pod
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: post-service-pod
+        owner: epamnikitafaskheyeu
+    spec:
+      containers:
+        - name: post-service-container
+          image: epamnikitafaskheyeu/post-service-app:v1.1
+          env:
+            - name: DB_HOST
+              value: post-service-db
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: post-db
+            - name: DB_USERNAME
+              value: postgres
+            - name: DB_PASSWORD
+              value: postgres
+            - name: USER_SERVICE_URL
+              value: http://user-service-app:8084
+          ports:
+            - containerPort: 8080
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-app
+  namespace: k8s-program
+spec:
+  selector:
+    matchLabels:
+      app: user-service-pod
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: user-service-pod
+        owner: epamnikitafaskheyeu
+    spec:
+      containers:
+        - name: user-service-container
+          image: epamnikitafaskheyeu/user-service-app:v1.1
+          env:
+            - name: DB_HOST
+              value: user-service-db
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: user-db
+            - name: DB_USERNAME
+              value: postgres
+            - name: DB_PASSWORD
+              value: postgres
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: user-volume
+              mountPath: /app/data
+      volumes:
+        - name: user-volume
+          persistentVolumeClaim:
+            claimName: user-pvc
