@@ -19,4 +19,5 @@ public class Post {
     private String authorId;
     private String text;
     private LocalDate postedAt;
+    private String topic;
 }

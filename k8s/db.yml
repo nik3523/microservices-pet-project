@@ -27,11 +27,20 @@ spec:
               subPath: init.sql
           env:
             - name: POSTGRES_USER
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: post-db-credentials
+                  key: DB_USERNAME
             - name: POSTGRES_PASSWORD
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: post-db-credentials
+                  key: DB_PASSWORD
             - name: POSTGRES_DB
-              value: post-db
+              valueFrom:
+                configMapKeyRef:
+                  name: post-service-env-config
+                  key: DB_NAME
       volumes:
         - name: post-service-db-init-volume
           configMap:
@@ -77,11 +86,20 @@ spec:
               subPath: init.sql
           env:
             - name: POSTGRES_USER
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-credentials
+                  key: DB_USERNAME
             - name: POSTGRES_PASSWORD
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-credentials
+                  key: DB_PASSWORD
             - name: POSTGRES_DB
-              value: user-db
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-env-config
+                  key: DB_NAME
       volumes:
         - name: user-service-db-init-volume
           configMap:
