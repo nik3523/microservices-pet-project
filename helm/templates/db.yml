@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: post-service-postgres
+spec:
+  serviceName: post-service-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-service-postgres
+  template:
+    metadata:
+      labels:
+        app: post-service-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: post-service-db-volume
+              mountPath: /var/lib/postgresql
+            - name: post-service-db-init-volume
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: post-db-credentials
+                  key: DB_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: post-db-credentials
+                  key: DB_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: post-service-env-config
+                  key: DB_NAME
+      volumes:
+        - name: post-service-db-init-volume
+          configMap:
+            name: post-service-init-db
+  volumeClaimTemplates:
+    - metadata:
+        name: post-service-db-volume
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 1G
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: user-service-postgres
+spec:
+  serviceName: user-service-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-postgres
+  template:
+    metadata:
+      labels:
+        app: user-service-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: user-service-db-volume
+              mountPath: /var/lib/postgresql
+            - name: user-service-db-init-volume
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-credentials
+                  key: DB_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-credentials
+                  key: DB_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-env-config
+                  key: DB_NAME
+      volumes:
+        - name: user-service-db-init-volume
+          configMap:
+            name: user-service-init-db
+  volumeClaimTemplates:
+    - metadata:
+        name: user-service-db-volume
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 1G
