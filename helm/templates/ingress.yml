@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: "/posts/api/v1(/|$)(.*)"
+            backend:
+              service:
+                name: post-service-app
+                port:
+                  number: 8080
+          - pathType: Prefix
+            path: "/users/api/v1(/|$)(.*)"
+            backend:
+              service:
+                name: user-service-app
+                port:
+                  number: 8080
+      host: localhost

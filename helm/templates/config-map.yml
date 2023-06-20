@@ -60,7 +60,7 @@ data:
   DB_HOST: "post-service-db"
   DB_PORT: "5432"
   DB_NAME: "post-db"
-  USER_SERVICE_URL: "http://user-service-app:8084"
+  USER_SERVICE_URL: "http://user-service-app:8080"
 
 ---
 
